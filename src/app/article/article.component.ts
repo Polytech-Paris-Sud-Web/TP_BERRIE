@@ -1,6 +1,8 @@
 import {Component, Input, Output, OnInit} from '@angular/core';
 import {Article} from '../models/article';
 import { EventEmitter } from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
+import {ArticleService} from '../services/article.service';
 
 @Component({
   selector: 'app-article',
@@ -13,15 +15,21 @@ export class ArticleComponent implements OnInit {
   article: Article;
 
   @Output()
-  deletedArticle : EventEmitter<Article> = new EventEmitter();
+  deletedArticle: EventEmitter<Article> = new EventEmitter();
 
-  constructor() {
+  constructor(
+    private route: ActivatedRoute,
+    private articleService: ArticleService,
+  ) {
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
+    this.route.paramMap.subscribe(async params => {
+      this.article = await this.articleService.getById(params.get('id')).toPromise();
+    });
   }
 
-  delete(){
+  delete(): void {
     this.deletedArticle.emit(this.article);
   }
 
